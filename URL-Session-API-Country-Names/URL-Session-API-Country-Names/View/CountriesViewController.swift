@@ -2,7 +2,12 @@ import UIKit
 
 class CountriesViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var countrySearchBar: UISearchBar!
+    var searchText = ""
+
+
     var viewModel = CountriesViewModel()
+    var refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,10 +21,27 @@ class CountriesViewController: UIViewController {
         viewModel.delegate = self
         tableView.delegate = self
         tableView.dataSource = self
+        refreshControl.attributedTitle = NSAttributedString(string : "Loading...")
+        refreshControl.addTarget(self, action: #selector(pullToRefresh(sender: )), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+        countrySearchBar.delegate = self
+        countrySearchBar.returnKeyType = UIReturnKeyType.done
+//        tableView.reloadData()
+
     }
-    
+    @objc func pullToRefresh(sender : UIRefreshControl){
+        sender.endRefreshing()
+        tableView.reloadData()
+    }
     func callApi() {
         viewModel.fetchDataByDelegate()
+    }
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        countrySearchBar.endEditing(true)
+    }
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        searchBar.endEditing(true)
     }
 }
 
@@ -65,5 +87,11 @@ extension CountriesViewController:CountriesViewModelToViewDelegate{
     
     func didFailToRecieveCountries(error: String) {
         print(error)
+    }
+}
+extension CountriesViewController: UISearchBarDelegate {
+    public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel.searchText = searchText
+        tableView.reloadData()
     }
 }
