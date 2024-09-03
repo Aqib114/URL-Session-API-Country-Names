@@ -45,14 +45,14 @@ class CountriesViewModel {
         let country = filteredCountries()[section]
         let cities = countriesDictionary[country] ?? []
         return cities.filter {
-            searchText.isEmpty || $0.city.lowercased().hasPrefix(searchText.lowercased())
+            searchText.isEmpty || $0.city.lowercased().contains(searchText.lowercased())
         }.count
     }
     
     func cityNames(for indexPath: IndexPath) -> String? {
         let country = filteredCountries()[indexPath.section]
         let cities = countriesDictionary[country]?.filter {
-            searchText.isEmpty || $0.city.lowercased().hasPrefix(searchText.lowercased())
+            searchText.isEmpty || $0.city.lowercased().contains(searchText.lowercased())
         }
         return cities?[indexPath.row].city
     }
@@ -60,7 +60,7 @@ class CountriesViewModel {
     private func filteredCountries() -> [String] {
         let countries = Array(countriesDictionary.keys).sorted()
         return countries.filter {
-            searchText.isEmpty || $0.uppercased().hasPrefix(searchText.uppercased())
+            searchText.isEmpty || $0.uppercased().contains(searchText.uppercased())
         }
     }
 }
